@@ -1,6 +1,7 @@
+![example](example.png)
+
 # SpeedTest
 
-![example](example.png)
 A minimal CLI internet speed tester written in Go with zero external dependencies.
 
 ## How it works
@@ -84,5 +85,5 @@ speedtest/
 
 ---
 <p align="center">
-  Made with ❤️ by <a href="https://github.com/wollydev24">WollyDev24 | Copyright © 2026</a>
+  Made with ❤️ by <a href="https://github.com/wollydev24">WollyDev24</a>  | Copyright © 2026
 </p>
