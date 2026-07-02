@@ -1,3 +1,5 @@
+![example](example.png)
+
 # SpeedTest
 
 A minimal CLI internet speed tester written in Go with zero external dependencies.
