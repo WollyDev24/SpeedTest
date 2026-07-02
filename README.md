@@ -1,4 +1,4 @@
-![example](example.gif)
+![example](showcase.gif)
 
 # SpeedTest
 
