@@ -81,3 +81,8 @@ speedtest/
 ├── go.mod         # Go module file
 └── README.md      # This file
 ```
+
+---
+<p align="center">
+  Made with ❤️ by <a href="https://github.com/wollydev24">WollyDev24 | Copyright © 2026</a>
+</p>
