@@ -44,7 +44,7 @@ speedtest [options]
 | `-B` | `false` | Display speeds in MB/s instead of Mbps |
 | `-no-download` | `false` | Skip download test |
 | `-no-upload` | `false` | Skip upload test |
-| `-update` | update the script when installed globally |
+| `-update` | `-` | update the script when installed globally |
 
 Default download URL: `https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm`
 
