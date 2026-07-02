@@ -9,7 +9,6 @@ import (
 type pulser struct {
 	prefix string
 	speed  float64
-	status string
 	mu     sync.RWMutex
 	stopCh chan struct{}
 	done   sync.WaitGroup
@@ -31,14 +30,10 @@ func newPulser(prefix string) *pulser {
 				}
 				p.mu.RLock()
 				s := p.speed
-				st := p.status
 				p.mu.RUnlock()
 				line := fmt.Sprintf("\r%s %s", prefix, f)
 				if s > 0 {
 					line = fmt.Sprintf("\r%s %s  %s", prefix, f, formatSpeed(s))
-					if st != "" {
-						line += fmt.Sprintf("  \033[38;5;245m# %s\033[0m", st)
-					}
 				}
 				fmt.Print(line)
 				time.Sleep(pulseDelay(s))
@@ -51,12 +46,6 @@ func newPulser(prefix string) *pulser {
 func (p *pulser) SetSpeed(s float64) {
 	p.mu.Lock()
 	p.speed = s
-	p.mu.Unlock()
-}
-
-func (p *pulser) SetStatus(s string) {
-	p.mu.Lock()
-	p.status = s
 	p.mu.Unlock()
 }
 

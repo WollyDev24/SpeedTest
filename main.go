@@ -3,6 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"time"
 )
 
@@ -16,10 +19,57 @@ var (
 	noUpload   = flag.Bool("no-upload", false, "skip upload test")
 	noDownload = flag.Bool("no-download", false, "skip download test")
 	byteMode   = flag.Bool("B", false, "display speeds in MB/s instead of Mbps")
+	update     = flag.Bool("update", false, "rebuild and reinstall the binary")
 )
+
+func findGoMod() (string, error) {
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	for i := 0; i < 5; i++ {
+		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
+			return dir, nil
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			break
+		}
+		dir = parent
+	}
+	return "", fmt.Errorf("go.mod not found (run from the project directory)")
+}
 
 func main() {
 	flag.Parse()
+
+	if *update {
+		src, err := findGoMod()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		tmp := filepath.Join(src, ".speedtest-tmp")
+		cmd := exec.Command("go", "build", "-o", tmp, ".")
+		cmd.Dir = src
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		if err := cmd.Run(); err != nil {
+			os.Exit(1)
+		}
+		exe, _ := os.Executable()
+		if err := os.Rename(tmp, exe); err != nil {
+			cmd = exec.Command("sudo", "mv", tmp, exe)
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			if err := cmd.Run(); err != nil {
+				os.Remove(tmp)
+				os.Exit(1)
+			}
+		}
+		fmt.Println("Updated")
+		os.Exit(0)
+	}
 
 	var totalPing, totalDl, totalUl float64
 	pingN, dlN, ulN := 0, 0, 0
@@ -32,7 +82,6 @@ func main() {
 			pre = fmt.Sprintf("  ping (%d/%d)", i+1, *average)
 		}
 		p := newPulser(pre)
-		p.SetStatus("pinging")
 		ping, err := MeasureLatency(*pingURL, 3)
 		p.Close()
 		fmt.Print("\033[2K\r")
@@ -47,7 +96,6 @@ func main() {
 				pre = fmt.Sprintf("  ↓ (%d/%d)", i+1, *average)
 			}
 			p := newPulser(pre)
-			p.SetStatus("downloading")
 			speed, _ := MeasureDownload(*dlURL, time.Duration(*duration)*time.Second, *concurrent, func(s float64) {
 				p.SetSpeed(s)
 			})
@@ -63,7 +111,6 @@ func main() {
 				pre = fmt.Sprintf("  ↑ (%d/%d)", i+1, *average)
 			}
 			p := newPulser(pre)
-			p.SetStatus("uploading")
 			speed, _ := MeasureUpload(*uploadURL, time.Duration(*duration)*time.Second, *concurrent, func(s float64) {
 				p.SetSpeed(s)
 			})
