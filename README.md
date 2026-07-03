@@ -26,6 +26,13 @@ go build -o speedtest .
 sudo mv speedtest /usr/local/bin/
 ```
 
+### Termux
+```sh
+pkg install golang
+go build -o speedtest .
+mv speedtest $PREFIX/bin/
+```
+
 ## Usage
 
 ```

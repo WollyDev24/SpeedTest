@@ -59,7 +59,11 @@ func main() {
 		}
 		exe, _ := os.Executable()
 		if err := os.Rename(tmp, exe); err != nil {
-			cmd = exec.Command("sudo", "mv", tmp, exe)
+			if _, e := exec.LookPath("sudo"); e == nil {
+				cmd = exec.Command("sudo", "mv", tmp, exe)
+			} else {
+				cmd = exec.Command("mv", tmp, exe)
+			}
 			cmd.Stdout = os.Stdout
 			cmd.Stderr = os.Stderr
 			if err := cmd.Run(); err != nil {
